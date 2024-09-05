@@ -1,4 +1,7 @@
 using Api.Data;
+using Api.Interfaces;
+using Api.Mapping;
+using Api.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +13,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddScoped<IStockRepository, StockRepository>();
 
 var app = builder.Build();
 

@@ -1,1 +1,16 @@
+# Ignore Visual Studio temporary files, build results, and
+# User-specific files
 .vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore build output folders
+bin/
+obj/
+
+# Ignore packages
+packages/
+*.nupkg
