@@ -34,7 +34,7 @@ namespace Api.Repositories
             return newStock.Entity;
         }
 
-        public async Task<Stock?> UpdateAsync(int id ,Stock stock)
+        public async Task<Stock?> UpdateAsync(int id, Stock stock)
         {
             var stockModel = await _context.Stocks.FindAsync(id);
             if (stockModel is null) { return null; }
@@ -60,5 +60,11 @@ namespace Api.Repositories
 
             return stockModel;
         }
+
+        public async Task<bool> CheckExistAsync(int id)
+        {
+            return await _context.Stocks.AnyAsync(s => s.Id == id);
+        }
     }
+
 }

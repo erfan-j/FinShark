@@ -13,13 +13,16 @@ namespace Api.Controllers
     public class CommentsController : Controller
     {
         private readonly ICommentRepository _commentRepository;
+        private readonly IStockRepository _stockRepository;
         private readonly IMapper _mapper;
 
 
-        public CommentsController(ICommentRepository commentRepository, IMapper mapper)
+
+        public CommentsController(ICommentRepository commentRepository, IMapper mapper, IStockRepository stockRepository)
         {
             _commentRepository = commentRepository;
             _mapper = mapper;
+            _stockRepository = stockRepository;
         }
 
         [HttpGet]
@@ -43,6 +46,7 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateCommentDto input) 
         {
+            if (!await _stockRepository.CheckExistAsync(input.StockId)) { return BadRequest("Stock not found"); }
             var comment = _mapper.Map<Comment>(input);
             var newComment = await _commentRepository.CreateAsync(comment);
             var commentDto = _mapper.Map<Comment, CommentDto>(newComment);
