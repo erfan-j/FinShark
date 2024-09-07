@@ -25,7 +25,7 @@ namespace Api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var stocks = await _stockRepository.GetListAsync();
-            var stockDto = _mapper.Map<List<Stock>, List<StockDto>>(stocks);
+            var stockDto = _mapper.Map<List<Stock>>(stocks);
             return Ok(stockDto);
         }
 
@@ -36,7 +36,7 @@ namespace Api.Controllers
 
             if (stock == null) { return NotFound(); }
 
-            var stockDto = _mapper.Map<Stock, StockDto>(stock);
+            var stockDto = _mapper.Map<Stock>(stock);
             return Ok(stockDto);
         }
 
@@ -45,7 +45,7 @@ namespace Api.Controllers
         {
             var stock = _mapper.Map<CreateStockDto, Stock>(input);
             await _stockRepository.CreateAsync(stock);
-            var stockDto = _mapper.Map<Stock, StockDto>(stock);
+            var stockDto = _mapper.Map<Stock>(stock);
             return CreatedAtAction(nameof(GetById), new { id = stock.Id }, stockDto);
         }
 
@@ -55,7 +55,7 @@ namespace Api.Controllers
             var stock = _mapper.Map<UpdateStockDto, Stock>(input);
             var updatedStok =  await _stockRepository.UpdateAsync(id, stock);
             if (updatedStok is null) { return NotFound(); }
-            var stockDto = _mapper.Map<Stock, StockDto>(stock); //TODO: there should be another way instead of two mappings.
+            var stockDto = _mapper.Map<Stock>(stock); //TODO: there should be another way instead of two mappings.
             return Ok(stockDto);
         }
 
