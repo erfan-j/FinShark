@@ -56,7 +56,6 @@ namespace Api.Controllers
             var updatedComment = await _commentRepository.UpdateAsync(id, comment);
             if (updatedComment is null) { return NotFound(); }
             var commentDto = _mapper.Map<Comment, CommentDto>(updatedComment);
-
             return Ok(commentDto);
         }
 
