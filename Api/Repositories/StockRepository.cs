@@ -22,7 +22,7 @@ namespace Api.Repositories
 
         public async Task<Stock?> FindAsync(int id)
         {
-            var stock = await _context.Stocks.FindAsync(id);
+            var stock = await _context.Stocks.Include(x => x.Comments).FirstOrDefaultAsync(s => s.Id == id);
 
             return stock;
         }
@@ -55,7 +55,7 @@ namespace Api.Repositories
             var stockModel = await _context.Stocks.FindAsync(id);
             if (stockModel is null) { return null; }
 
-            _context.Remove(id);
+            _context.Remove(stockModel);
             await _context.SaveChangesAsync();
 
             return stockModel;

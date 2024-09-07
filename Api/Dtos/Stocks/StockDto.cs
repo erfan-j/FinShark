@@ -1,4 +1,6 @@
-﻿namespace Api.Dtos.Stocks
+﻿using Api.Models;
+
+namespace Api.Dtos.Stocks
 {
     public class StockDto
     {
@@ -9,5 +11,7 @@
         public decimal LastDiv { get; set; }
         public string Industry { get; set; } = string.Empty;
         public long MarketCap { get; set; }
+
+        public List<Comment>? MyProperty { get; set; } = new List<Comment>();
     }
 }
