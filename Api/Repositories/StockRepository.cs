@@ -1,6 +1,8 @@
 ﻿using Api.Data;
+using Api.Dtos.Stocks;
 using Api.Interfaces;
 using Api.Models;
+using Api.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace Api.Repositories
@@ -14,10 +16,27 @@ namespace Api.Repositories
             _context = context;
         }
 
-        public async Task<List<Stock>> GetListAsync()
+        public async Task<CountedResult<Stock>> GetListAsync(QueryObject input)
         {
-            var stocks = await _context.Stocks.ToListAsync();
-            return stocks;
+            var q = _context.Stocks.Include(s => s.Comments).AsQueryable();
+            var totalCount = q.Count();
+
+            if (!string.IsNullOrEmpty(input.SearchValue))
+            {
+                q = q.Where(s => s.Industry.Contains(input.SearchValue) || s.Symbol.Contains(input.SearchValue));  
+            }
+
+            q = q.OrderByDescending(s => s.Industry);
+            q = q.Skip((input.Page - 1) * input.PageSize).Take(10);
+
+            var stocks = await q.ToListAsync();
+            var result = new CountedResult<Stock>
+            {
+                TotalCount = totalCount,
+                Result = stocks
+            };
+
+            return result;
         }
 
         public async Task<Stock?> FindAsync(int id)
@@ -61,7 +80,7 @@ namespace Api.Repositories
             return stockModel;
         }
 
-        public async Task<bool> CheckExistAsync(int id)
+        public async Task<bool> CheckExistAsync(int? id)
         {
             return await _context.Stocks.AnyAsync(s => s.Id == id);
         }

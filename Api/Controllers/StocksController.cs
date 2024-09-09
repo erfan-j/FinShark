@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Api.Data;
 using Api.Models;
 using Api.Dtos.Stocks;
 using AutoMapper;
 using Api.Interfaces;
+using Api.Dtos;
 
 namespace Api.Controllers
 {
@@ -22,11 +21,12 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject input)
         {
-            var stocks = await _stockRepository.GetListAsync();
-            var stockDto = _mapper.Map<List<Stock>>(stocks);
-            return Ok(stockDto);
+            var stocks = await _stockRepository.GetListAsync(input);
+            var stockDto = _mapper.Map<List<Stock>, List<StockDto>>(stocks.Result);
+            var pagedResult = new PagedResultDto<StockDto>(input.Page, stocks.TotalCount, input.PageSize, stockDto);
+            return Ok(pagedResult);
         }
 
         [HttpGet("{id}")]
@@ -41,6 +41,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> Create(CreateStockDto input)
         {
             var stock = _mapper.Map<CreateStockDto, Stock>(input);
@@ -50,6 +51,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto input)
         {
             var stock = _mapper.Map<UpdateStockDto, Stock>(input);

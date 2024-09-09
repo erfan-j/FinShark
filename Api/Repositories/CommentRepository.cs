@@ -16,7 +16,9 @@ namespace Api.Repositories
 
         public async Task<List<Comment>> GetListAsync()
         {
-            var comments = await _context.Comments.ToListAsync();
+            var comments = await _context.Comments.AsQueryable()
+                .OrderByDescending(x => x.CreationTime)
+                .ToListAsync();
             return comments;
         }
 

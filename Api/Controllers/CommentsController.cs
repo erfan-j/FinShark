@@ -1,8 +1,6 @@
 ﻿using Api.Dtos.Comments;
-using Api.Dtos.Stocks;
 using Api.Interfaces;
 using Api.Models;
-using Api.Repositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +42,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> Create(CreateCommentDto input) 
         {
             if (!await _stockRepository.CheckExistAsync(input.StockId)) { return BadRequest("Stock not found"); }
@@ -54,6 +53,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentDto input)
         {
             var comment = _mapper.Map<UpdateCommentDto, Comment>(input);
