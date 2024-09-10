@@ -29,7 +29,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 12;
+    options.Password.RequiredLength = 5;
 }).AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddAuthentication(options =>
 {
