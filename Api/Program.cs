@@ -4,10 +4,13 @@ using Api.Interfaces;
 using Api.Mapping;
 using Api.Models;
 using Api.Repositories;
+using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +48,9 @@ builder.Services.AddAuthentication(options =>
     ValidateIssuer = true,
     ValidIssuer = builder.Configuration["Jwt:Issuer"],
     ValidateAudience = true,
-    ValidAudience = builder.Configuration["Jwt:Audience"]
+    ValidAudience = builder.Configuration["Jwt:Audience"],
+    ValidateIssuerSigningKey = true,
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SignInKey"]!))
 });
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -58,6 +63,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options
 //Repos:
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+
+//Services:
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 

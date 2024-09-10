@@ -1,4 +1,5 @@
 ﻿using Api.Dtos.Account;
+using Api.Interfaces;
 using Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,17 +11,20 @@ namespace Api.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<User> _userManager;
+        private readonly ITokenService _tokenService;
 
-        public AccountController(UserManager<User> userManager)
+        public AccountController(UserManager<User> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> Register(RegisterDto input)
         {
-            try {
+            try
+            {
                 var user = new User
                 {
                     UserName = input.UserName,
@@ -33,7 +37,13 @@ namespace Api.Controllers
                     var userRoles = await _userManager.AddToRoleAsync(user, "user");
                     if (userRoles.Succeeded)
                     {
-                        return Ok("User registered successfully");
+                        var result = new UserRegisteredResultDto
+                        {
+                            UserName = user.UserName,
+                            Email = user.Email,
+                            Token = _tokenService.CreateToken(user),
+                        };
+                        return Ok(result);
                     }
                     else
                     {
