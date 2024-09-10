@@ -4,11 +4,13 @@ using Api.Dtos.Stocks;
 using AutoMapper;
 using Api.Interfaces;
 using Api.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Api.Controllers
 {
     [Route("api/stock")]
     [ApiController]
+    [Authorize]
     public class StocksController : Controller
     {
         private readonly IMapper _mapper;

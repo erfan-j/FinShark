@@ -2,12 +2,14 @@
 using Api.Interfaces;
 using Api.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
     [Route("/api/comment")]
     [ApiController]
+    [Authorize]
     public class CommentsController : Controller
     {
         private readonly ICommentRepository _commentRepository;
