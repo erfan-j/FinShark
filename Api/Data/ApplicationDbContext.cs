@@ -19,17 +19,19 @@ namespace Api.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Portfolio>(x => x.HasKey(p => new { p.UserId, p.StockId }));
+            builder.Entity<Portfolio>(b =>
+            {
+                b.HasKey(p => new { p.UserId, p.StockId });
 
-            builder.Entity<Portfolio>()
-                .HasOne(u => u.User)
+                b.HasOne(u => u.User)
                 .WithMany(u => u.Portfolios)
                 .HasForeignKey(u => u.UserId);
 
-            builder.Entity<Portfolio>()
-                .HasOne(u => u.Stock)
+                b.HasOne(u => u.Stock)
                 .WithMany(u => u.Portfolios)
                 .HasForeignKey(u => u.StockId);
+            });
+
 
             List<IdentityRole> Roles = new List<IdentityRole>
                 {
@@ -47,7 +49,7 @@ namespace Api.Data
                 }
             };
 
-            builder.Entity<IdentityRole>().HasData(Roles); 
+            builder.Entity<IdentityRole>().HasData(Roles);
         }
     }
 }

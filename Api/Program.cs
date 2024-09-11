@@ -90,6 +90,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options
 //Repos:
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IPortfolioRepository, PortfolioRepository>();
 
 //Services:
 builder.Services.AddScoped<ITokenService, TokenService>();

@@ -7,7 +7,7 @@ namespace Api.Mapping
 {
     public class MappingProfile : Profile
     {
-        public MappingProfile() 
+        public MappingProfile()
         {
             //Stock:
             CreateMap<Stock, StockDto>(MemberList.Destination);
@@ -24,6 +24,15 @@ namespace Api.Mapping
             CreateMap<Comment, CreateCommentDto>(MemberList.Destination).ReverseMap();
             CreateMap<Comment, UpdateCommentDto>(MemberList.Destination);
             CreateMap<Comment, UpdateCommentDto>(MemberList.Destination).ReverseMap();
+
+            //Portfolio
+            CreateMap<Portfolio, Stock>()
+           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.StockId))
+           .ForMember(dest => dest.Symbol, opt => opt.MapFrom(src => src.Stock!.Symbol))
+           .ForMember(dest => dest.Purchase, opt => opt.MapFrom(src => src.Stock!.Purchase))
+           .ForMember(dest => dest.LastDiv, opt => opt.MapFrom(src => src.Stock!.LastDiv))
+           .ForMember(dest => dest.Industry, opt => opt.MapFrom(src => src.Stock!.Industry))
+           .ForMember(dest => dest.MarketCap, opt => opt.MapFrom(src => src.Stock!.MarketCap));
         }
     }
 }
