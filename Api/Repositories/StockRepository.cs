@@ -18,7 +18,10 @@ namespace Api.Repositories
 
         public async Task<CountedResult<Stock>> GetListAsync(QueryObject input)
         {
-            var q = _context.Stocks.Include(s => s.Comments).AsQueryable();
+            var q = _context.Stocks
+                .Include(s => s.Comments)
+                .ThenInclude(c => c.User)
+                .AsQueryable();
             var totalCount = q.Count();
 
             if (!string.IsNullOrEmpty(input.SearchValue))

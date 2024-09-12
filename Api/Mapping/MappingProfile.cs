@@ -1,5 +1,6 @@
 ﻿using Api.Dtos.Comments;
 using Api.Dtos.Stocks;
+using Api.Dtos.Users;
 using Api.Models;
 using AutoMapper;
 
@@ -33,6 +34,10 @@ namespace Api.Mapping
            .ForMember(dest => dest.LastDiv, opt => opt.MapFrom(src => src.Stock!.LastDiv))
            .ForMember(dest => dest.Industry, opt => opt.MapFrom(src => src.Stock!.Industry))
            .ForMember(dest => dest.MarketCap, opt => opt.MapFrom(src => src.Stock!.MarketCap));
+
+            //User:
+            CreateMap<User, UserDto>(MemberList.Destination);
+            CreateMap<User, UserDto>(MemberList.Destination).ReverseMap();
         }
     }
 }

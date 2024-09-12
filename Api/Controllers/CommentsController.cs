@@ -4,6 +4,7 @@ using Api.Models;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Api.Controllers
 {
@@ -30,7 +31,7 @@ namespace Api.Controllers
         {
             var comments = await _commentRepository.GetListAsync();
 
-            var commentsDto = _mapper.Map<List<Comment>>(comments);
+            var commentsDto = _mapper.Map<List<Comment>, List<CommentDto>>(comments);
             return Ok(commentsDto);
         }
 
@@ -49,6 +50,8 @@ namespace Api.Controllers
         {
             if (!await _stockRepository.CheckExistAsync(input.StockId)) { return BadRequest("Stock not found"); }
             var comment = _mapper.Map<Comment>(input);
+            var userId = User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            comment.UserId = userId;
             var newComment = await _commentRepository.CreateAsync(comment);
             var commentDto = _mapper.Map<Comment, CommentDto>(newComment);
             return CreatedAtAction(nameof(GetById), new { id = comment.Id }, commentDto);

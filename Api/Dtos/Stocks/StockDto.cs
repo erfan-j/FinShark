@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Dtos.Comments;
+using Api.Models;
 
 namespace Api.Dtos.Stocks
 {
@@ -12,6 +13,6 @@ namespace Api.Dtos.Stocks
         public string Industry { get; set; } = string.Empty;
         public long MarketCap { get; set; }
 
-        public List<Comment>? Comments { get; set; } = new List<Comment>();
+        public List<CommentDto>? Comments { get; set; } = new List<CommentDto>();
     }
 }
