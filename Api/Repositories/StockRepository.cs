@@ -19,6 +19,7 @@ namespace Api.Repositories
         public async Task<CountedResult<Stock>> GetListAsync(QueryObject input)
         {
             var q = _context.Stocks
+                .AsNoTracking()
                 .Include(s => s.Comments)
                 .ThenInclude(c => c.User)
                 .AsQueryable();
@@ -44,7 +45,10 @@ namespace Api.Repositories
 
         public async Task<Stock?> FindAsync(int id)
         {
-            var stock = await _context.Stocks.Include(x => x.Comments).FirstOrDefaultAsync(s => s.Id == id);
+            var stock = await _context.Stocks
+                .AsNoTracking()
+                .Include(x => x.Comments)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             return stock;
         }
@@ -85,12 +89,15 @@ namespace Api.Repositories
 
         public async Task<bool> CheckExistAsync(int? id)
         {
-            return await _context.Stocks.AnyAsync(s => s.Id == id);
+            return await _context.Stocks.AsNoTracking()
+                .AnyAsync(s => s.Id == id);
         }
 
         public async Task<Stock?> FindBySymbolAsync(string symbol)
         {
-            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
+            return await _context.Stocks
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
     }
 

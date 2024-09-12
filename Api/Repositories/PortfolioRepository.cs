@@ -19,7 +19,9 @@ namespace Api.Repositories
 
         public async Task<List<Stock>> GetUserPortfoliosAsync(string id)
         {
-            var portfolios = await _context.portfolios.Include(p => p.Stock)
+            var portfolios = await _context.portfolios
+                .AsNoTracking()
+                .Include(p => p.Stock)
            .Where(p => p.UserId == id)
            .ToListAsync();
 
@@ -28,9 +30,9 @@ namespace Api.Repositories
 
         public async Task<Portfolio> CreateAsync(Portfolio portfolio)
         {
-                await _context.portfolios.AddAsync(portfolio);
-                await _context.SaveChangesAsync();
-                return portfolio;
+            await _context.portfolios.AddAsync(portfolio);
+            await _context.SaveChangesAsync();
+            return portfolio;
         }
 
         public async Task<Portfolio?> DeleteAsync(int stockId, string userId)
