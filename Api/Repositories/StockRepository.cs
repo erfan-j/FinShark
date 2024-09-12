@@ -84,6 +84,11 @@ namespace Api.Repositories
         {
             return await _context.Stocks.AnyAsync(s => s.Id == id);
         }
+
+        public async Task<Stock?> FindBySymbolAsync(string symbol)
+        {
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
+        }
     }
 
 }
