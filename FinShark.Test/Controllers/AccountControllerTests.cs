@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace FinShark.Test.Controllers
 {
@@ -54,8 +55,6 @@ namespace FinShark.Test.Controllers
                 Password = "TestPassword123"
             };
 
-            var user = new User { UserName = registerDto.UserName, Email = registerDto.EmailAddress };
-
             _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
 
@@ -78,6 +77,111 @@ namespace FinShark.Test.Controllers
             responseValue!.UserName.Should().Be(registerDto.UserName);
             responseValue.Email.Should().Be(registerDto.EmailAddress);
             responseValue.Token.Should().Be("mockedToken");
+        }
+
+        [Fact]
+        public async Task Register_ReturnsStatus500_WhenUserCreationFails()
+        {
+            // Arrange
+            var registerDto = new RegisterDto
+            {
+                UserName = "testUser",
+                EmailAddress = "test@example.com",
+                Password = "TestPassword123"
+            };
+
+            var identityErrors = new IdentityError
+            {
+                Code = null!,
+                Description = "User creation failed."
+            };
+            var failedResult = IdentityResult.Failed(identityErrors);
+
+            _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), It.IsAny<string>()))
+                .ReturnsAsync(failedResult);
+
+            // Act
+            var result = await _accountController.Register(registerDto);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            objectResult.Should().NotBeNull();
+            objectResult!.StatusCode.Should().Be(500);
+
+            // Extract the actual IdentityError from the response and compare the properties
+            //objectResult.Value.Should().Be(identityErrors);   ---> because this line dose not work 
+            var actualErrors = objectResult.Value as IEnumerable<IdentityError>;
+            actualErrors.Should().ContainSingle();
+            actualErrors!.First().Description.Should().Be(identityErrors.Description);
+            actualErrors!.First().Code.Should().Be(identityErrors.Code);
+
+        }
+
+        [Fact]
+        public async Task Login_ReturnsOk_WhenUserIsSuccessfullyLoggedIn()
+        {
+            //Arrange
+            var loginDto = new LoginDto
+            {
+                UserName = "testUser",
+                Password = "testPassword"
+            };
+
+            var user = new User { UserName = loginDto.UserName, Email = "testUser@Email.com" };
+
+            _mockUserManager.Setup(x => x.FindByNameAsync(It.IsAny<string>()))
+               .ReturnsAsync(user);
+
+            _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(SignInResult.Success);
+
+            _mockTokenService.Setup(x => x.CreateToken(It.IsAny<User>()))
+               .Returns("mockedToken");
+
+            //Act 
+            var result = await _accountController.Login(loginDto);
+
+            //Assert
+            var okResult = result as ObjectResult;
+            okResult.Should().NotBeNull();
+            okResult!.StatusCode.Should().Be(200);
+
+            var responseValue = okResult.Value as UserRegisteredResultDto;
+            responseValue.Should().NotBeNull();
+            responseValue!.UserName.Should().Be(user.UserName);
+            responseValue.Email.Should().Be(user.Email);
+            responseValue.Token.Should().Be("mockedToken");
+        }
+
+        [Fact]
+        public async Task Login_ReturnsUnAuthorize_WhenUserLoginFails()
+        {
+            //Arrange
+            var loginDto = new LoginDto
+            {
+                UserName = "testUser",
+                Password = "testPassword"
+            };
+
+            var user = new User { UserName = loginDto.UserName, Email = "testUser@Email.com" };
+
+            _mockUserManager.Setup(x => x.FindByNameAsync(It.IsAny<string>()))
+               .ReturnsAsync(user);
+
+            _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<bool>()))
+                .ReturnsAsync(SignInResult.Failed);
+
+            //Act 
+            var result = await _accountController.Login(loginDto);
+
+            //Assert
+            var objectResult = result as UnauthorizedObjectResult;
+            objectResult.Should().NotBeNull();
+            objectResult!.StatusCode.Should().Be(401);
+
+            var responseValue = objectResult.Value as string;
+            responseValue.Should().NotBeNull();
+            responseValue.Should().Be("Invalid UserName or Password!");
         }
     }
 }
