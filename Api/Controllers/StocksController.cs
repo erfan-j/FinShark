@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Api.Models;
+﻿using Api.Dtos;
 using Api.Dtos.Stocks;
-using AutoMapper;
 using Api.Interfaces;
-using Api.Dtos;
+using Api.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
@@ -57,7 +57,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockDto input)
         {
             var stock = _mapper.Map<UpdateStockDto, Stock>(input);
-            var updatedStok =  await _stockRepository.UpdateAsync(id, stock);
+            var updatedStok = await _stockRepository.UpdateAsync(id, stock);
             if (updatedStok is null) { return NotFound(); }
             var stockDto = _mapper.Map<Stock>(stock); //TODO: there should be another way instead of two mappings.
             return Ok(stockDto);
@@ -70,6 +70,5 @@ namespace Api.Controllers
             if (deletedStock is null) { return NotFound(); }
             return Ok();
         }
-
     }
 }
